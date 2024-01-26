@@ -1,19 +1,45 @@
-import { world } from "mojang-minecraft";
+import { world } from "@minecraft/server";
 
-let sokunuke = new Object();
+// 記録するための変数を準備しておく
+let sokunuke = {}
 
-world.events.playerJoin.subscribe(joins => {
-  sokunuke[joins.player.name] = new Date(new Date().getTime() + 9 * 60 * 60 * 1000);
+
+//プレイヤーが参加したとき
+world.afterEvents.playerJoin.subscribe(data => {
+  // はじめ
+
+  // 参加したときの時間を記録しておく
+  sokunuke[data.playerName] = new Date().getTime() + 9 * 60 * 60 * 1000
+  
+  // おわり
 })
 
-world.events.playerLeave.subscribe(joins => {
-  const playern = joins.playerName
-  let dt1 = new Date(sokunuke[joins.playerName]);
-  let dt2 = new Date(new Date().getTime() + 9 * 60 * 60 * 1000);
-  let diffTime = dt2.getTime() - dt1.getTime();
-  let dtim = new Date(diffTime);
-  if (dtim.getMinutes() == 0) {
-    const datas = {rawtext:[{text: `§l§c《§e即抜け§c》 §r§e${playern}§r§e が即抜けをしたみたいです。 即抜けRTA: ${dtim.getSeconds()}.${dtim.getMilliseconds()}秒!`}]}
-    world.getDimension("overworld").runCommand(`tellraw @a ${JSON.stringify(datas)}`)
+
+//プレイヤーが抜けたとき
+world.afterEvents.playerLeave.subscribe(data => {
+  // はじめ
+
+  // 記録になかったら処理しない
+  if (!sokunuke[data.playerName]) return
+  // 参加したときの時間を記録から取り出す
+  let joined = sokunuke[data.playerName]
+  // 抜けたときの時間 (現在時刻)を取得
+  let left = new Date().getTime() + 9 * 60 * 60 * 1000
+  // 抜けたときの時間‐参加したときの時間＝参加時間
+  let jointime = left - joined
+
+  // もし参加時間が1分未満だったら
+  if (jointime < 60000){
+    // 秒に計算
+    let sec = Math.floor(jointime / 1000)
+    // ミリ秒に計算
+    let milli = jointime % 1000
+    //メッセージをチャットに表示
+    world.sendMessage(`§e${data.playerName} が即抜け! 即抜けRTA: ${sec}.${milli}秒!`)
   }
+
+  // 抜けた人のデータはもう要らないので削除
+  delete sokunuke[data.playerName]
+
+  // おわり
 })

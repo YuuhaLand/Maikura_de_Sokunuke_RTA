@@ -1,0 +1,26 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "即抜けRTA",
+    "description": "即抜けを検知して通知します!\nby YuuhaLand",
+    "version": [ 1, 1, 0 ],
+    "uuid": "cc541bc1-3a8d-4018-a778-56f2640eb488",
+    "min_engine_version": [ 1, 13, 0 ]
+  },
+  "modules": [
+    {
+      "type": "script",
+      "language": "javascript",
+      "description": "",
+      "version": [ 1, 1, 0 ],
+      "uuid": "dbb2c27c-29bd-497f-8a08-3275d674bf96",
+      "entry": "scripts/Main.js"
+    }
+  ],
+  "dependencies": [
+    {
+      "module_name": "@minecraft/server",
+      "version": "1.5.0"
+    }
+  ]
+}
